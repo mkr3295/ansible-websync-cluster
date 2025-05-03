@@ -1,0 +1,7 @@
+- name: Setup web content sync on slave servers
+  hosts: slaves
+  become: yes
+  roles:
+    - websync
+  vars_files:
+  - vault.yml

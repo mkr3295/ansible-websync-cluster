@@ -1,0 +1,35 @@
+- name: Install rsync on both RHEL and Ubuntu
+  package:
+    name: rsync
+    state: present
+
+- name: Install NGINX on Ubuntu
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install NGINX on RHEL
+  dnf:
+    name: nginx
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure NGINX is started and enabled
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Deploy sync script on slave servers
+  copy:
+    src: sync_web.sh
+    dest: /usr/local/bin/sync_web.sh
+    mode: '0755'
+
+- name: Schedule cron job for syncing web content
+  cron:
+    name: "Sync web content from master"
+    job: "/usr/local/bin/sync_web.sh"
+    minute: "*/5"
